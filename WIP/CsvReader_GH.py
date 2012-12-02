@@ -1,5 +1,5 @@
 # COPYRIGHT NOTICE: 
-# This script Its Develped By DHDA STUDIO
+# This script Its Developed By DHDA STUDIO
 # The purpose of this script its to develop a Component that
 # Handle CSV Files, and manage it like a Index Data Base 
 # # Copyright for the Script by Toussaint Jimenez, 2012. 
@@ -19,6 +19,7 @@ import sys
 import clr
 import System
 
+
 from System import *
 
 # for accesssing GH classes
@@ -32,36 +33,49 @@ assemblyPath = "C:\Program Files\Rhinoceros 5.0 Evaluation (64-bit)\Plug-ins\Iro
 assembly = Assembly.LoadFile(assemblyPath)
 clr.AddReference(assembly)
 
-from System.IO import StringReader
+from System.IO import StreamReader
 from LumenWorks.Framework.IO.Csv import CsvReader
 # End of Importation
 
-#Open the CSV file
-file = open(filePath,"r")
-data = file.read()
-
-#Create component for reading CSV file 
-csvReader = CsvReader(StringReader(data), True)
-csvReader.SkipEmptyLines = True
-
-#Get Indexes of source columns based on header.
-headers = csvReader.GetFieldHeaders()
-listHeaders = str(headers).split(separator)
+#Create Operation for Open and reading CSV file 
+csvFile = CsvReader(StreamReader(filePath), True) 
+csvFile.SkipEmptyLines = True
+#End of the Operation
 
 
+#Create Operation Header
+header = [csvFile.GetFieldHeaders()]                 # Retrieve the Csv Header
+csvHeader = header[0]                                # Call the Header
+headerstr = csvHeader[0]                             # release the Header from the internal Array
+headerFields = headerstr.split(delimiter)       # List of the Fields in GH Data type
+#End of the Operation
 
-#Get Data of source Based on File.
-dataRead = CsvReader(StringReader(data), False)
+#Raw Csv Data
+csvRawData = csvFile.GetCurrentRawData()
+#End of the Operation
+
+#Operation Data Csv File 
+contentData = []
+while csvFile.ReadNextRecord():
+    contentCount = csvFile.FieldCount
+    for i in range (contentCount):                       #Start Looping to Fill ContentData with CSV File RawData
+        contentData.append(csvFile[i])
+
+
+csvDataFields = contentData[rowStart:rowEnd]
 
 
 
-csvlist = []                        #create a List to Store Csv Data
-while dataRead.ReadNextRecord():    #Read each Record on the CSV file 
-    row = []
-    colCount = dataRead.FieldCount
-    for i in range(colCount):       # Star Looping to Fill the row 
-        row.append(dataRead[i])
-    csvlist.append(row)
+#Operation for Graft The Data
+newlist = []
+newlist = csvDataFields[:]
 
-csvData = str(csvlist).split(",")   #return the list of Data to the Output
+graftedTree = DataTree[object]()
+for i in range(len(newlist)):
+    str =newlist[i]
+    path = GH_Path(i)
+    graftedTree.AddRange([str],path)
+
+graftedData = graftedTree
+#End of the Graft
 
