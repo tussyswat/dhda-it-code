@@ -21,7 +21,8 @@ from Grasshopper import DataTree
 
 #Variable Declaration and Casting Type
 data = csvDataFields
-index = (int(headerFieldIndex)+1) #Casting the Variable plus One to pass it in cmp sorted funtion
+index = (int(headerFieldIndex)) #Casting the Variable plus One to pass it in cmp sorted funtion
+
 
 # Build a right list to be sorted by any Field
 a = []
@@ -31,35 +32,35 @@ for i in data:
         splitA = j.split(delimiter)
     a.append(splitA)
 
-# Operation Sort by Index Field
+
+#dataTree = DataTree[object]()
+#for i, thing in enumerate(data):
+#    branch_id = branch_ids[i]
+#    path = GH_Path(branch_id)
+#    dataTree.Add(thing, path)
+#a = dataTree
+
+
+
+#Operation Sort by Index Field
 xSortedList = sorted(a, cmp=lambda x, y: cmp(x[(index)], y[(index)]))
 
 # Problem Here with the LIST IN LIST to a proper output to Grasshopper
-sortedList = xSortedList
+
+#Operation Sorted List Transformation to GH DataTree to solve the list in list
+wSortedList = DataTree[object]()                    #Call DataTree Internal GH List Object
+for k in range(len(xSortedList)):                   #Star Loop the List in List Sorted
+    branch_id = xSortedList[k]                      #Retrieve the (k)nth Item
+    DataConverted = (delimiter).join(branch_id)     #Join the List to a Single String Line with the delimiter
+    path = GH_Path(0)                               #Path Constructor
+    wSortedList.Add(DataConverted, path)            #Append Operation to the List.
+
+sortedList = wSortedList
+#Enb Operation
 
 
 
 
-
-
-
-
-
-
-
-
-
-"""
-fxSortedList = reduce(lambda x, y: x+y, xSortedList) #Flatterned List
-
-n1 = len(data) # Length of data list
-n2 = len(fxSortedList) #Length of Flatterned and Sorted List 
-n = int(n2/n1)
-
-sortedList = [fxSortedList[i:i+n] for i in range(0, n2, n)]
-
-print sortedList
-"""
 
 
 
